@@ -1,0 +1,68 @@
+#include "mainwindow.h"
+#include "generate_dialog.h"
+#include "ui_mainwindow.h"
+#include <QCryptographicHash>
+#include <QStringListModel>
+#include <QFile>
+#include <QApplication>
+#include <QtGui>
+#include <thread>
+#include <qobject.h>
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    readFile();
+    fileWatcher();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+
+QString hashPassword(QString password )
+{
+    QString salt  = password.append("saltyString");
+    return QString(QCryptographicHash::hash((password.toUtf8().constData()),QCryptographicHash::Md5).toHex());
+}
+
+
+void MainWindow::on_Generate_button_clicked()
+{
+    Generate_dialog Generate_dialog;
+    Generate_dialog.setModal(true);
+    Generate_dialog.exec();
+}
+
+
+
+void MainWindow::readFile()
+{
+
+    QStringList *allLines = new QStringList(); //Your list for lines from the file.
+    allLines->clear();
+    QStringListModel *linesModel = new QStringListModel(*allLines, NULL); //Your model to set to the view.
+
+    QFile file("secure_secrets.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine(); //Lines are read as QByteArray.
+        const char *line_c = line.data(); //convert to const char*
+        QString line_str = QString(QLatin1String(line_c)); //And finally convert to QString
+        allLines->append(line_str); //Add to the list
+    }
+    linesModel->setStringList(*allLines); //Set your model's list your stringlist
+    ui->PasswordListView->setModel(linesModel); //set model of your listView linesModel. You need to use your listView's name, which might be ui->listView.
+}
+
+void MainWindow::fileWatcher()
+{
+    QFileInfo checkFile("secure_secrets.txt");
+    std::this_thread::sleep_for(std::chrono::milliseconds(120));
+    connect(watcher,SIGNAL(readFileSingal()),SLOT(readFile()));
+}

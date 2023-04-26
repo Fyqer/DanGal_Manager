@@ -1,0 +1,22 @@
+#ifndef GENERATE_WINDOW_H
+#define GENERATE_WINDOW_H
+
+#include <QDialog>
+
+namespace Ui {
+class Generate_window;
+}
+
+class Generate_window : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit Generate_window(QWidget *parent = nullptr);
+    ~Generate_window();
+
+private:
+    Ui::Generate_window *ui;
+};
+
+#endif // GENERATE_WINDOW_H
