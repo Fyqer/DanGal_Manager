@@ -9,11 +9,14 @@
 #include <QtCore>
 #include <QMessageBox>
 #include <iostream>
+
+namespace fs = std::filesystem;
 SetNewMasterPassword::SetNewMasterPassword(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SetNewMasterPassword)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 SetNewMasterPassword::~SetNewMasterPassword()
@@ -31,9 +34,10 @@ void SetNewMasterPassword::on_buttonBox_accepted()
 {
 
     newMasterPassword =  ui->masterPassword->toPlainText();
-
     GenerateHash(salt+newMasterPassword+salt);
     QString filename = "masterPassword.txt";
+
+    RemoveAllPasswords();
     try {
        if (std::filesystem::remove(filename.toStdString()))
           std::cout << "file " << filename.toStdString() << " deleted.\n";
@@ -50,3 +54,38 @@ void SetNewMasterPassword::on_buttonBox_accepted()
       file.close();
 }
 
+
+void SetNewMasterPassword::RemoveAllPasswords()
+{
+    std::vector<std::string> passwordFiles = GetFileNamesList();
+
+    for(auto f : passwordFiles)
+    {
+        try
+        {
+
+          if (std::filesystem::remove(f))
+             std::cout << "file " << f << " deleted.\n";
+          else
+             std::cout << "file " << f << " not found.\n";
+        }
+        catch(const std::filesystem::filesystem_error& err) {
+           std::cout << "filesystem error: " << err.what() << '\n';
+        }
+
+    }
+}
+
+std::vector<std::string>  SetNewMasterPassword::GetFileNamesList()
+{
+    std::vector<std::string> txtFiles;
+    std::string path = ".";
+    for (const auto &entry : fs::directory_iterator(path)) {
+         // Check if the file has a .txt extension and exclude "masterPassword.txt"
+         if (entry.path().extension() == ".txt" && entry.path().filename() != "masterPassword.txt") {
+             std::cout << entry.path() << std::endl;
+             txtFiles.push_back(entry.path().filename().string());
+         }
+     }
+    return txtFiles;
+}

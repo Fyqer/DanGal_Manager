@@ -14,6 +14,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <filesystem>
+#include <string>
 #include <array>
 #include <stdio.h>
 #include <cstring>
@@ -22,11 +24,18 @@
 #include <algorithm>
 #include <QCryptographicHash>
 #include "qaesencryption.h"
+
+
+namespace fs = std::filesystem;
 mainwindowdialog::mainwindowdialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::mainwindowdialog)
 {
     ui->setupUi(this);
+    QPixmap pixmap("pay_ico.ico");
+    ui->pushButton->setIcon(QIcon(pixmap));
+    ui->pushButton->setIconSize(pixmap.size());
+    setWindowIcon(QIcon("DG.ico"));
     readFile();
     fileWatcher();
     authorizedFlag = true;
@@ -47,31 +56,46 @@ void mainwindowdialog::on_Generate_button_clicked()
 
 void mainwindowdialog::readFile()
 {
+    std::vector<std::string> txtFiles;
+    std::string path = ".";
+    for (const auto &entry : fs::directory_iterator(path)) {
+         // Check if the file has a .txt extension and exclude "masterPassword.txt"
+         if (entry.path().extension() == ".txt" && entry.path().filename() != "masterPassword.txt") {
+             std::cout << entry.path() << std::endl;
+             txtFiles.push_back(entry.path().filename().string());
+         }
+     }
+
     authorizedFlag++;
-    DeleteEmptyLines("secure_secrets.txt");
     QStringList *allLines = new QStringList();
     allLines->clear();
     QStringListModel *linesModel = new QStringListModel(*allLines, NULL);
+    for(const std::string &fileName : txtFiles )
+    {
 
-    QFile file("secure_secrets.txt");
+    QString qFileName = QString::fromStdString(fileName);
+   // DeleteEmptyLines(fileName);
+    QFile file(qFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
-    while (!file.atEnd()) {
+    while (!file.atEnd())
+    {
         QByteArray line = file.readLine();
         const char *line_c = line.data();
         QString line_str;
         line_str  = QString(line_c);
-        allLines->append(Decode(line_str));
 
+        allLines->append( qFileName.remove(qFileName.length()-4 ,4) +  "      " +  Decode(line_str));
+
+
+     }
     }
-    linesModel->setStringList(*allLines);
-    ui->PasswordListView->setModel(linesModel);
-    ui->PasswordListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
-
-//https://github.com/bricke/Qt-AES
+ linesModel->setStringList(*allLines);
+ ui->PasswordListView->setModel(linesModel);
+ ui->PasswordListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
+
 
 QString mainwindowdialog::Decode(QString lineString)
 {
@@ -118,3 +142,10 @@ void mainwindowdialog::on_PasswordListView_pressed(const QModelIndex &index)
     selected_password_dialog.setServiceAndPassowrd(firstList.takeFirst(), firstList.takeLast());
     selected_password_dialog.exec();
 }
+
+void mainwindowdialog::on_pushButton_clicked()
+{
+    QString link = "https://paypal.me/shazzgold?country.x=PL&locale.x=pl_PL";
+    QDesktopServices::openUrl(QUrl(link));
+}
+

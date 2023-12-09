@@ -14,10 +14,9 @@ class ConfirmDeleteDialog : public QDialog
 public:
     explicit ConfirmDeleteDialog(QWidget *parent = nullptr);
     ~ConfirmDeleteDialog();
-    QString password;
+    QString fileName;
     void setPassowrd( QString password);
     void deletePassword();
-    QByteArray encodePassowrd(QString password);
 private slots:
     void on_buttonBox_accepted();
 

@@ -1,4 +1,5 @@
 #include "add_password_dialog.h"
+#include "qmessagebox.h"
 #include "ui_add_password_dialog.h"
 #include <QFile>
 #include <QCryptographicHash>
@@ -20,11 +21,13 @@
 #include <algorithm>
 #include <QCryptographicHash>
 #include "qaesencryption.h"
+namespace fs = std::filesystem;
 add_password_dialog::add_password_dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::add_password_dialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 add_password_dialog::~add_password_dialog()
@@ -33,23 +36,52 @@ add_password_dialog::~add_password_dialog()
 }
 
 
+
+std::vector<std::string> getFileNamesList()
+{
+    std::vector<std::string> txtFiles;
+    std::string path = ".";
+    for (const auto &entry : fs::directory_iterator(path)) {
+         // Check if the file has a .txt extension and exclude "masterPassword.txt"
+         if (entry.path().extension() == ".txt" && entry.path().filename() != "masterPassword.txt") {
+             std::cout << entry.path() << std::endl;
+             txtFiles.push_back(entry.path().filename().string());
+         }
+     }
+    return txtFiles;
+}
+
+
+
 void add_password_dialog::setPassword(QString psswd)
 {
    password = psswd;
    ui->passwordLabelEdit->setText(psswd);
 }
 
+// nie moze byc taka sama nazwa pliku - sprawdzic!
 
-void add_password_dialog::addPassword(QByteArray password)
+void add_password_dialog::addPassword(QString filename, QByteArray password)
 {
+     std::vector<std::string> fileNames = getFileNamesList();
+
+     auto it = std::find(fileNames.begin(), fileNames.end(), (filename + ".txt").toStdString());
+         if (it == fileNames.end()) {
     // Create a new file
-       QFile file("secure_secrets.txt");
+       QFile file(filename + ".txt");
        file.open(QIODevice::WriteOnly | QIODevice::Append);
        QTextStream out(&file);
        QString passwordString = QString::fromLocal8Bit(password);
        out <<  passwordString;
-       out << "\n";
        file.close();
+         }
+         else
+         {
+             QMessageBox msgBox;
+             msgBox.setText("Service already exists. Delete previous password and set new one.");
+             msgBox.exec();
+             return;
+         }
  }
 
 QByteArray add_password_dialog::encodePassowrd(QString password)
@@ -68,6 +100,6 @@ QByteArray add_password_dialog::encodePassowrd(QString password)
 }
 void add_password_dialog::on_pushButton_clicked()
 {
-      addPassword(encodePassowrd( /*ui->serviceNameEdit->toPlainText() + "   " +  na razie bez*/ ui->passwordLabelEdit->toPlainText()));
+      addPassword( ui->serviceNameEdit->toPlainText(), encodePassowrd(ui->passwordLabelEdit->toPlainText()));
 }
 

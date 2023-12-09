@@ -13,6 +13,7 @@ CheckMasterPassword::CheckMasterPassword(QWidget *parent) :
     ui(new Ui::CheckMasterPassword)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 CheckMasterPassword::~CheckMasterPassword()

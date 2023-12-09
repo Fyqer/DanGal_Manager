@@ -9,6 +9,7 @@ Generate_dialog::Generate_dialog(QWidget *parent) :
     ui(new Ui::Generate_dialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 Generate_dialog::~Generate_dialog()

@@ -23,6 +23,8 @@ private slots:
     void readFile();
     void on_PasswordListView_pressed(const QModelIndex &index);
     QString Decode(QString lineString);
+    void on_pushButton_clicked();
+
 signals:
     void readFileSingal();
 

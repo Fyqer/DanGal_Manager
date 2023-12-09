@@ -19,11 +19,16 @@
 #include <algorithm>
 #include <QCryptographicHash>
 #include "qaesencryption.h"
+#include <filesystem>
+#include <iostream>
+#include <string>
+namespace fs = std::filesystem;
 ConfirmDeleteDialog::ConfirmDeleteDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConfirmDeleteDialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 ConfirmDeleteDialog::~ConfirmDeleteDialog()
@@ -32,58 +37,26 @@ ConfirmDeleteDialog::~ConfirmDeleteDialog()
 }
 void ConfirmDeleteDialog::setPassowrd(QString psswd)
 {
-    password = psswd;
+    fileName = psswd;
 }
 void ConfirmDeleteDialog::deletePassword()
 {
 //finding
- password.toStdString();
-    std::ifstream data_store;
-    std::string linee;
-    auto  pswd =  QString::fromLocal8Bit("\n" + encodePassowrd(password)).toStdString();
+ auto f = (fileName + ".txt").toStdString();
+//deleting
+ try {
 
-    std::string lineFound;
-    data_store.open("secure_secrets.txt");
-    while (getline(data_store, linee))
-    {
-        if (linee.find(pswd) != std::string::npos)
-            lineFound = linee;
-    }
-    std::cout<< pswd;
-data_store.close();
-
-    //deleting
-    std::string line;
-    std::ifstream file;
-      std::ofstream outfile;
-      file.open("secure_secrets.txt");
-      outfile.open("newM.txt");
-      while (getline(file, line)) {
-          if (line != lineFound) {
-              outfile << line << std::endl;
-          }
-      }
-      outfile.close();
-      file.close();
-      remove("secure_secrets.txt");
-      rename("newM.txt", "secure_secrets.txt");
+   if (std::filesystem::remove(f))
+      std::cout << "file " << f << " deleted.\n";
+   else
+      std::cout << "file " << f << " not found.\n";
+ }
+ catch(const std::filesystem::filesystem_error& err) {
+    std::cout << "filesystem error: " << err.what() << '\n';
+ }
 
 }
 
-QByteArray ConfirmDeleteDialog::encodePassowrd(QString record)
-{
-
-    QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
-    QString key("5TGB&YHN7UJM(IK<");
-    QString iv("!QAZ2WSX#EDC4RFV");
-
-    QByteArray hashKey = QCryptographicHash::hash(key.toLocal8Bit(), QCryptographicHash::Sha256);
-    QByteArray hashIV = QCryptographicHash::hash(iv.toLocal8Bit(), QCryptographicHash::Md5);
-
-    QByteArray encodeText = encryption.encode(record.toLocal8Bit(), hashKey, hashIV);
-    return encodeText;
-
-}
 void ConfirmDeleteDialog::on_buttonBox_accepted()
 {
     ConfirmDeleteDialog::deletePassword();

@@ -17,7 +17,7 @@ public:
     QString serviceName;
     QString password;
     void setPassword(QString s);
-    void addPassword(QByteArray passEncoded);
+    void addPassword(QString filename, QByteArray passEncoded);
 
 private slots:
     void on_pushButton_clicked();

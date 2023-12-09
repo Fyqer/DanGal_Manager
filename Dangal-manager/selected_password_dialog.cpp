@@ -6,6 +6,7 @@ selected_password_dialog::selected_password_dialog(QWidget *parent) :
     ui(new Ui::selected_password_dialog)
 {
     ui->setupUi(this);
+    setWindowIcon(QIcon("DG.ico"));
 }
 
 selected_password_dialog::~selected_password_dialog()
@@ -18,7 +19,7 @@ void selected_password_dialog::setServiceAndPassowrd(QString service, QString pa
     serviceName = service;
     ui->passwordLabelEdit->setText(password);
     ui->serviceNameEdit->setText(serviceName);
-    itemTextRecord =  ui->serviceNameEdit->toPlainText() + "   " +  ui->passwordLabelEdit->toPlainText();
+    itemTextRecord =  ui->serviceNameEdit->toPlainText(); //+ "   " +  ui->passwordLabelEdit->toPlainText();
 }
 
 void selected_password_dialog::on_deleteButton_clicked()

@@ -16,8 +16,10 @@ public:
     ~SetNewMasterPassword();
 
 private slots:
-    void on_buttonBox_accepted();
+   void on_buttonBox_accepted();
    void GenerateHash(QString string);
+   void RemoveAllPasswords();
+   std::vector<std::string> GetFileNamesList();
 
 private:
    QString salt = "524w325DFG4sE$";
