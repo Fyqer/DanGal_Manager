@@ -1,7 +1,6 @@
 # DanGal Manager
-                                                        ----- application not fininsed yet -----
 
-This is project of small desktop application for managing password without using netowrk connection.
+This is project of small desktop application for managing password without using netowrk connection. 
 
 
 ### Available Functions
