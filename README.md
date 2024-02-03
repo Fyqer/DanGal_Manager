@@ -29,5 +29,11 @@ By default the padding method is `ISO`, however, the class supports:
 * PKCS7
 * ISO
 
+
+#### LAUNCHING:
+The program does not need to install additional libraries. To run the program, use an executable file (.exe).
+- the program will ask us to enter the master password, if we have not used it before, a new masterPassword file with the master password hash will appear.
+- run exe file again and start using it!
+- 
 Application using a third-party code for AES encryption, repository:( https://github.com/bricke/Qt-AES)
 
