@@ -19,6 +19,8 @@ void selected_password_dialog::setServiceAndPassowrd(QString service, QString pa
     serviceName = service;
     ui->passwordLabelEdit->setText(password);
     ui->serviceNameEdit->setText(serviceName);
+    ui->serviceNameEdit->setReadOnly(true);
+    ui->passwordLabelEdit->setReadOnly(true);
     itemTextRecord =  ui->serviceNameEdit->toPlainText(); //+ "   " +  ui->passwordLabelEdit->toPlainText();
 }
 
